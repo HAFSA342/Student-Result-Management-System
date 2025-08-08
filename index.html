@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInDown 1s ease-out forwards;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-section, .result-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .marks-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            text-align: center;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .result-card.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .grade-a { background: #4caf50; }
+        .grade-b { background: #2196f3; }
+        .grade-c { background: #ff9800; }
+        .grade-d { background: #f44336; }
+        .grade-f { background: #9e9e9e; }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.6s forwards;
+        }
+
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .info-section p, .info-section ul {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            color: #555;
+        }
+
+        .info-section ul {
+            padding-left: 1.5rem;
+        }
+
+        .info-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .student-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .marks-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 2rem;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Student Result Management System</h1>
+            <p class="subtitle">Open Ended Lab Project - Academic Performance Calculator</p>
+        </div>
+        <div class="main-content">
+            <div class="form-section">
+                <h2 class="section-title">📝 Enter Student Details</h2>
+                
+                <div class="student-info">
+                    <div class="form-group">
+                        <label for="studentName">Student Name:</label>
+                        <input type="text" id="studentName" placeholder="Enter student name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rollNumber">Roll Number:</label>
+                        <input type="text" id="rollNumber" placeholder="Enter roll number" required>
+                    </div>
+                </div>
+                <h3 style="color: #667eea; margin-bottom: 1rem;">📚 Subject Marks (Out of 100)</h3>            
+                <div class="marks-grid">
+                    <div class="form-group">
+                        <label for="subject1">Mathematics:</label>
+                        <input type="number" id="subject1" min="0" max="100" placeholder="Enter marks">
+                        <div class="error-message" id="error1">Please enter valid marks (0-100)</div>
+                    </div>                
+                    <div class="form-group">
+                        <label for="subject2">Physics:</label>
+                        <input type="number" id="subject2" min="0" max="100" placeholder="Enter marks">
+                        <div class="error-message" id="error2">Please enter valid marks (0-100)</div>
+                    </div>                    
+                    <div class="form-group">
+                        <label for="subject3">Chemistry:</label>
+                        <input type="number" id="subject3" min="0" max="100" placeholder="Enter marks">
+                        <div class="error-message" id="error3">Please enter valid marks (0-100)</div>
+                    </div>                   
+                    <div class="form-group">
+                        <label for="subject4">Biology:</label>
+                        <input type="number" id="subject4" min="0" max="100" placeholder="Enter marks">
+                        <div class="error-message" id="error4">Please enter valid marks (0-100)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject5">English:</label>
+                        <input type="number" id="subject5" min="0" max="100" placeholder="Enter marks">
+                        <div class="error-message" id="error5">Please enter valid marks (0-100)</div>
+                    </div>                   
+                    <div class="form-group">
+                        <label for="subject6">Computer Science:</label>
+                        <input type="number" id="subject6" min="0" max="100" placeholder="Enter marks">
+                        <div class="error-message" id="error6">Please enter valid marks (0-100)</div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="calculateResult()">🧮 Calculate Result</button>
+            </div>
+            <div class="result-section">
+                <h2 class="section-title">📊 Result Summary</h2>              
+                <div id="studentDetails" style="display: none;">
+                    <div style="background: #f5f5f5; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem;">
+                        <p><strong>Name:</strong> <span id="displayName">-</span></p>
+                        <p><strong>Roll No:</strong> <span id="displayRoll">-</span></p>
+                    </div>
+                </div>
+                
+                <div class="result-card" id="totalCard">
+                    <div class="result-value" id="totalMarks">-</div>
+                    <div class="result-label">Total Marks (out of 600)</div>
+                </div>
+                
+                <div class="result-card" id="percentageCard">
+                    <div class="result-value" id="percentage">-</div>
+                    <div class="result-label">Percentage</div>
+                </div>
+                
+                <div class="result-card" id="gradeCard">
+                    <div class="result-value" id="grade">-</div>
+                    <div class="result-label">Grade</div>
+                    <div class="grade-badge" id="gradeBadge" style="display: none;">A+</div>
+                </div>
+                
+                <div id="resultStatus" style="margin-top: 1.5rem; text-align: center; font-size: 1.1rem; font-weight: 600;">
+                    <p>Enter marks to see results</p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function validateInput(value, errorId) {
+                const errorElement = document.getElementById(errorId);
+                if (value < 0 || value > 100 || isNaN(value)) {
+                    errorElement.style.display = 'block';
+                    return false;
+                } else {
+                    errorElement.style.display = 'none';
+                    return true;
+                }
+            }
+
+            function calculateGrade(percentage) {
+                if (percentage >= 90) return { grade: 'A+', class: 'grade-a' };
+                else if (percentage >= 80) return { grade: 'A', class: 'grade-a' };
+                else if (percentage >= 70) return { grade: 'B', class: 'grade-b' };
+                else if (percentage >= 60) return { grade: 'C', class: 'grade-c' };
+                else if (percentage >= 50) return { grade: 'D', class: 'grade-d' };
+                else return { grade: 'F', class: 'grade-f' };
+            }
+
+            function calculateResult() {
+                // Get student details
+                const studentName = document.getElementById('studentName').value.trim();
+                const rollNumber = document.getElementById('rollNumber').value.trim();
+                
+                if (!studentName || !rollNumber) {
+                    alert('Please enter student name and roll number');
+                    return;
+                }
+
+                // Get marks
+                const marks = [];
+                let isValid = true;
+                
+                for (let i = 1; i <= 6; i++) {
+                    const value = parseFloat(document.getElementById(`subject${i}`).value);
+                    if (!validateInput(value, `error${i}`)) {
+                        isValid = false;
+                    } else {
+                        marks.push(value);
+                    }
+                }
+
+                if (!isValid || marks.length !== 6) {
+                    return;
+                }
+
+                // Calculate results
+                const totalMarks = marks.reduce((sum, mark) => sum + mark, 0);
+                const percentage = (totalMarks / 600) * 100;
+                const gradeInfo = calculateGrade(percentage);
+
+                // Display student details
+                document.getElementById('displayName').textContent = studentName;
+                document.getElementById('displayRoll').textContent = rollNumber;
+                document.getElementById('studentDetails').style.display = 'block';
+
+                // Display results with animation
+                setTimeout(() => {
+                    document.getElementById('totalMarks').textContent = totalMarks.toFixed(0);
+                    document.getElementById('totalCard').classList.add('show');
+                }, 200);
+
+                setTimeout(() => {
+                    document.getElementById('percentage').textContent = percentage.toFixed(2) + '%';
+                    document.getElementById('percentageCard').classList.add('show');
+                }, 400);
+
+                setTimeout(() => {
+                    document.getElementById('grade').textContent = gradeInfo.grade;
+                    document.getElementById('gradeCard').classList.add('show');
+                    
+                    const gradeBadge = document.getElementById('gradeBadge');
+                    gradeBadge.textContent = gradeInfo.grade;
+                    gradeBadge.className = `grade-badge ${gradeInfo.class}`;
+                    gradeBadge.style.display = 'inline-block';
+                }, 600);
+
+                // Update status
+                const status = percentage >= 50 ? 
+                    `🎉 Congratulations! ${studentName} has passed with ${gradeInfo.grade} grade` :
+                    `📚 ${studentName} needs improvement. Keep working hard!`;
+                
+                setTimeout(() => {
+                    document.getElementById('resultStatus').innerHTML = `<p style="color: ${percentage >= 50 ? '#4caf50' : '#f44336'}">${status}</p>`;
+                }, 800);
+            }
+
+            // Real-time validation
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`subject${i}`).addEventListener('input', function() {
+                    const value = parseFloat(this.value);
+                    if (this.value !== '') {
+                        validateInput(value, `error${i}`);
+                    } else {
+                        document.getElementById(`error${i}`).style.display = 'none';
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>
